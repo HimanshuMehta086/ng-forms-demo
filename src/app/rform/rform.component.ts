@@ -9,6 +9,8 @@ import {
   FormGroup
 } from '@angular/forms';
 import { Observable, of, Subscription } from 'rxjs';
+import { ValidationService } from '../validation.service';
+import { mergeMap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-rform',
@@ -20,7 +22,10 @@ export class RformComponent implements OnInit, OnDestroy {
   validName = 'Default';
   createSubscription: Subscription;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private validationService: ValidationService
+  ) {
     this.form = this.formBuilder.group({
       on: ['', Validators.required],
       name: ['', [Validators.required], this.asyncNameValidator.bind(this)],
@@ -60,11 +65,17 @@ export class RformComponent implements OnInit, OnDestroy {
   ): Promise<ValidationErrors> | Observable<ValidationErrors> {
     let val = control.value;
 
-    if (this.validName === val) {
-      return of(null); //  null for passing validation
-    } else {
-      return of({ async_error: true });
-    }
+    return of(val).pipe(
+      mergeMap(v => this.validationService.validate(val)),
+
+      map(v => {
+        if (v['valid']) {
+          return null;
+        } else {
+          return { async_error: true };
+        }
+      })
+    );
 
     // promise implementation: should resolve in either case!
 

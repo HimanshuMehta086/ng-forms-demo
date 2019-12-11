@@ -19,12 +19,33 @@ export class RegistrationComponent implements OnInit {
         [
           Validators.required,
           Validators.minLength(10),
-          Validators.maxLength(11)
+          Validators.maxLength(11),
+          Validators.pattern('[0-9]*')
         ]
       ],
       dateOfBirth: [''],
       password: ['', [Validators.required, Validators.pattern('[0-9]*')]]
     });
+  }
+
+  get username() {
+    return this.form.controls['username'];
+  }
+
+  get email() {
+    return this.form.controls['email'];
+  }
+
+  get phonenumber() {
+    return this.form.controls['phonenumber'];
+  }
+
+  get dateOfBirth() {
+    return this.form.controls['dateOfBirth'];
+  }
+
+  get password() {
+    return this.form.controls['password'];
   }
 
   onSubmit() {
